@@ -6,18 +6,18 @@
 
 # For the fileURL variable, put the complete address 
 # of the zipped Casper QuickAdd installer package
- 
+
 fileURL="http://server_name_here.domain.com/quickadd_name_goes_here.zip"
- 
+
 # For the jss_server_address variable, put the complete 
 # fully qualified domain name address of your Casper server
- 
+
 jss_server_address="server_name_here.domain.com"
- 
+
 # For the jss_server_address variable, put the port number 
 # of your Casper server. This is usually 8443; change as
 # appropriate.
- 
+
 jss_server_port="8443"
 
 # For the log_location variable, put the preferred 
@@ -219,6 +219,27 @@ fi
 
 }
 
+CheckBinary (){
+ 
+# Identify location of jamf binary.
+#
+# If the jamf binary is not found, this check will return a
+# null value. This null value is used by the CheckCasper
+# function, in the "Checking for the jamf binary" section
+# of the function.
+
+jamf_binary=`/usr/bin/which jamf`
+
+ if [[ "$jamf_binary" == "" ]] && [[ -e "/usr/sbin/jamf" ]] && [[ ! -e "/usr/local/jamf" ]]; then
+    jamf_binary="/usr/sbin/jamf"
+ elif [[ "$jamf_binary" == "" ]] && [[ ! -e "/usr/sbin/jamf" ]] && [[ -e "/usr/local/jamf" ]]; then
+    jamf_binary="/usr/local/jamf"
+ elif [[ "$jamf_binary" == "" ]] && [[ -e "/usr/sbin/jamf" ]] && [[ -e "/usr/local/jamf" ]]; then
+    jamf_binary="/usr/local/jamf"
+ fi
+
+}
+
 InstallCasper () {
 
  # Check for the cached Casper QuickAdd installer and run it
@@ -249,16 +270,18 @@ CheckCasper () {
 
 
   # Checking for the jamf binary
-  if [[ ! -f "/usr/sbin/jamf" ]]; then
+  CheckBinary
+  if [[ "$jamf_binary" == "" ]]; then
     ScriptLogging "Casper's jamf binary is missing. It needs to be reinstalled."
     InstallCasper
+    CheckBinary
   fi
 
   # Verifying Permissions
-  /usr/bin/chflags noschg /usr/sbin/jamf
-  /usr/bin/chflags nouchg /usr/sbin/jamf
-  /usr/sbin/chown root:wheel /usr/sbin/jamf
-  /bin/chmod 755 /usr/sbin/jamf
+  /usr/bin/chflags noschg $jamf_binary
+  /usr/bin/chflags nouchg $jamf_binary
+  /usr/sbin/chown root:wheel $jamf_binary
+  /bin/chmod 755 $jamf_binary
   
   # Verifies that the JSS is responding to a communication query 
   # by the Casper agent. If the communication check returns a result
@@ -267,7 +290,7 @@ CheckCasper () {
   # the cached installer.
 
 
-  jss_comm_chk=`/usr/sbin/jamf checkJSSConnection > /dev/null; echo $?`
+  jss_comm_chk=`$jamf_binary checkJSSConnection > /dev/null; echo $?`
 
   if [[ "$jss_comm_chk" -eq 0 ]]; then
        ScriptLogging "Machine can connect to the JSS on $jss_server_address."
@@ -275,6 +298,7 @@ CheckCasper () {
        ScriptLogging "Machine cannot connect to the JSS on $jss_server_address."
        ScriptLogging "Reinstalling Casper agent to fix problem of Casper not being able to communicate with the JSS."
        InstallCasper
+       CheckBinary
   fi
 
   # Checking if machine can run a manual trigger
@@ -295,7 +319,7 @@ CheckCasper () {
   #
 
   
-  jamf_policy_chk=`/usr/sbin/jamf policy -trigger iscasperup | grep "Script result: up"`
+  jamf_policy_chk=`$jamf_binary policy -trigger iscasperup | grep "Script result: up"`
 
   # If the machine can run the specified policy, exit the script.
 
@@ -308,6 +332,7 @@ CheckCasper () {
   elif [[ ! -n "$jamf_policy_chk" ]]; then
     ScriptLogging "Reinstalling Casper agent to fix problem of Casper not being able to run policies"
     InstallCasper
+    CheckBinary
   fi
 
 
