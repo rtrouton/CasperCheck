@@ -146,7 +146,8 @@ If the check fails, the CasperCheck script will reinstall the Casper agent using
 8. The final check verifies if the Mac can run the specified policy. If the check fails, the CasperCheck script will reinstall the Casper agent using the QuickAdd installer stored on the Mac.
 
 
-For more details, visit the post linked below:
+Blog Posts
+-----------
 
-http://derflounder.wordpress.com/2014/04/23/caspercheck-an-auto-repair-process-for-casper-agents/
+https://derflounder.wordpress.com/category/caspercheck/
 
