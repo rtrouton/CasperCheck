@@ -51,7 +51,7 @@ As currently written, CasperCheck is set to run on startup and then once every w
 
 The LaunchDaemon will run on the following command on startup. After startup, the script will then run every seven days:
 
-sh /Library/Scripts/HHMI/caspercheck.sh
+sh /Library/Scripts/caspercheck.sh
 
 <?xml version="1.0" encoding="UTF-8"?>
  <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
