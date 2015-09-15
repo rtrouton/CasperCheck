@@ -146,6 +146,11 @@ If the check fails, the CasperCheck script will reinstall the Casper agent using
 8. The final check verifies if the Mac can run the specified policy. If the check fails, the CasperCheck script will reinstall the Casper agent using the QuickAdd installer stored on the Mac.
 
 
+Note: If you run "which jamf" with Casper 9.8 and later on Macs running 10.7 and later, you'll get back a result of "/usr/local/bin/jamf" as being the path to the Casper agent's "jamf" binary. While the actual "jamf" binary is located elsewhere in the filesystem, CasperCheck will be checking for the presence of the "/usr/local/bin/jamf" symlink.
+
+If the symlink is missing, CasperCheck's interpretation is that the symlink's absence means the Casper agent is not working properly and needs to be reinstalled using the QuickAdd installer stored on the Mac.
+
+
 Blog Posts
 -----------
 
