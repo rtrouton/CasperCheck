@@ -77,7 +77,7 @@ CasperCheck script
 
 The current version of the CasperCheck script is available from the following location:
 
-https://github.com/rtrouton/rtrouton_scripts/tree/master/rtrouton_scripts/Casper_Scripts/CasperCheck/script
+https://github.com/rtrouton/CasperCheck/blob/master/script/caspercheck.sh
 
 
 The CasperCheck script includes functions to do the following:
