@@ -58,7 +58,7 @@ ScriptLogging(){
 
 CheckForNetwork(){
 
-# Determine if the network is up by looking for any non-loopback network interfaces.
+    # Determine if the network is up by looking for any non-loopback network interfaces.
 
     local test
 
@@ -74,31 +74,31 @@ CheckForNetwork(){
 
 CheckSiteNetwork (){
 
-  #  CheckSiteNetwork function adapted from Facebook's check_corp function script.
-  #  check_corp script available on Facebook's IT-CPE Github repo:
-  #
-  # check_corp:
-  #   This script verifies a system is on the corporate network.
-  #   Input: CORP_URL= set this to a hostname on your corp network
-  #   Optional ($1) contains a parameter that is used for testing.
-  #   Output: Returns a check_corp variable that will return "True" if on
-  #   corp network, "False" otherwise.
-  #   If a parameter is passed ($1), the check_corp variable will return it
-  #   This is useful for testing scripts where you want to force check_corp
-  #   to be either "True" or "False"
-  # USAGE:
-  #   check_corp        # No parameter passed
-  #   check_corp "True"  # Parameter of "True" is passed and returned
+    #  CheckSiteNetwork function adapted from Facebook's check_corp function script.
+    #  check_corp script available on Facebook's IT-CPE Github repo:
+    #
+    # check_corp:
+    #   This script verifies a system is on the corporate network.
+    #   Input: CORP_URL= set this to a hostname on your corp network
+    #   Optional ($1) contains a parameter that is used for testing.
+    #   Output: Returns a check_corp variable that will return "True" if on
+    #   corp network, "False" otherwise.
+    #   If a parameter is passed ($1), the check_corp variable will return it
+    #   This is useful for testing scripts where you want to force check_corp
+    #   to be either "True" or "False"
+    # USAGE:
+    #   check_corp        # No parameter passed
+    #   check_corp "True"  # Parameter of "True" is passed and returned
 
 
-  site_network="False"
-  ping=`host -W .5 $jss_server_address`
+    site_network="False"
+    ping=`host -W .5 $jss_server_address`
 
-  # If the ping fails - site_network="False"
-  [[ $? -eq 0 ]] && site_network="True"
+    # If the ping fails - site_network="False"
+    [[ $? -eq 0 ]] && site_network="True"
 
-  # Check if we are using a test
-  [[ -n "$1" ]] && site_network="$1"
+    # Check if we are using a test
+    [[ -n "$1" ]] && site_network="$1"
 }
 
 #
@@ -134,12 +134,12 @@ update_quickadd () {
     zipfile_chk=`/usr/bin/unzip -tq $quickadd_zip > /dev/null; echo $?`
 
     if [ "$zipfile_chk" -eq 0 ]; then
-       ScriptLogging "Downloaded zip file appears to be a valid zip archive. Proceeding."
+        ScriptLogging "Downloaded zip file appears to be a valid zip archive. Proceeding."
     else
-       ScriptLogging "Downloaded zip file appears to be corrupted. Exiting CasperCheck."
-       ScriptLogging "======== CasperCheck Finished ========"
-       rm "$quickadd_zip"
-       exit 0
+        ScriptLogging "Downloaded zip file appears to be corrupted. Exiting CasperCheck."
+        ScriptLogging "======== CasperCheck Finished ========"
+        rm "$quickadd_zip"
+        exit 0
     fi
 
     # Create the destination directory if needed
@@ -182,158 +182,158 @@ update_quickadd () {
 
 CheckTomcat (){
 
-# Verifies that the JSS's Tomcat service is responding via its assigned port.
+    # Verifies that the JSS's Tomcat service is responding via its assigned port.
 
 
-tomcat_chk=`nc -z -w 5 $jss_server_address $jss_server_port > /dev/null; echo $?`
+    tomcat_chk=`nc -z -w 5 $jss_server_address $jss_server_port > /dev/null; echo $?`
 
-if [ "$tomcat_chk" -eq 0 ]; then
-       ScriptLogging "Machine can connect to $jss_server_address over port $jss_server_port. Proceeding."
-else
-       ScriptLogging "Machine cannot connect to $jss_server_address over port $jss_server_port. Exiting CasperCheck."
-       ScriptLogging "======== CasperCheck Finished ========"
-       exit 0
-fi
+    if [ "$tomcat_chk" -eq 0 ]; then
+        ScriptLogging "Machine can connect to $jss_server_address over port $jss_server_port. Proceeding."
+    else
+        ScriptLogging "Machine cannot connect to $jss_server_address over port $jss_server_port. Exiting CasperCheck."
+        ScriptLogging "======== CasperCheck Finished ========"
+        exit 0
+    fi
 
 }
 
 CheckInstaller (){
 
-# Compare timestamps and update the Casper agent
-# installer if needed.
+    # Compare timestamps and update the Casper agent
+    # installer if needed.
 
     modDate=$(myCurl --head $fileURL 2>/dev/null | awk -F': ' '/Last-Modified/{print $2}')
 
-if [[ -f "$quickadd_timestamp" ]]; then
-    cachedDate=$(cat "$quickadd_timestamp")
+    if [[ -f "$quickadd_timestamp" ]]; then
+        cachedDate=$(cat "$quickadd_timestamp")
 
 
-    if [[ "$cachedDate" == "$modDate" ]]; then
-        ScriptLogging "Current Casper installer already cached."
+        if [[ "$cachedDate" == "$modDate" ]]; then
+            ScriptLogging "Current Casper installer already cached."
+        else
+            update_quickadd
+        fi
     else
         update_quickadd
     fi
-else
-    update_quickadd
-fi
 
 }
 
 CheckBinary (){
 
-# Identify location of jamf binary.
-#
-# If the jamf binary is not found, this check will return a
-# null value. This null value is used by the CheckCasper
-# function, in the "Checking for the jamf binary" section
-# of the function.
+    # Identify location of jamf binary.
+    #
+    # If the jamf binary is not found, this check will return a
+    # null value. This null value is used by the CheckCasper
+    # function, in the "Checking for the jamf binary" section
+    # of the function.
 
-jamf_binary=`/usr/bin/which jamf`
+    jamf_binary=`/usr/bin/which jamf`
 
- if [[ "$jamf_binary" == "" ]] && [[ -e "/usr/sbin/jamf" ]] && [[ ! -e "/usr/local/bin/jamf" ]]; then
-    jamf_binary="/usr/sbin/jamf"
- elif [[ "$jamf_binary" == "" ]] && [[ ! -e "/usr/sbin/jamf" ]] && [[ -e "/usr/local/bin/jamf" ]]; then
-    jamf_binary="/usr/local/bin/jamf"
- elif [[ "$jamf_binary" == "" ]] && [[ -e "/usr/sbin/jamf" ]] && [[ -e "/usr/local/bin/jamf" ]]; then
-    jamf_binary="/usr/local/bin/jamf"
- fi
+    if [[ "$jamf_binary" == "" ]] && [[ -e "/usr/sbin/jamf" ]] && [[ ! -e "/usr/local/bin/jamf" ]]; then
+        jamf_binary="/usr/sbin/jamf"
+    elif [[ "$jamf_binary" == "" ]] && [[ ! -e "/usr/sbin/jamf" ]] && [[ -e "/usr/local/bin/jamf" ]]; then
+        jamf_binary="/usr/local/bin/jamf"
+    elif [[ "$jamf_binary" == "" ]] && [[ -e "/usr/sbin/jamf" ]] && [[ -e "/usr/local/bin/jamf" ]]; then
+        jamf_binary="/usr/local/bin/jamf"
+    fi
 
 }
 
 InstallCasper () {
 
- # Check for the cached Casper QuickAdd installer and run it
- # to fix problems with Casper being able to communicate with
- # the Casper server
+    # Check for the cached Casper QuickAdd installer and run it
+    # to fix problems with Casper being able to communicate with
+    # the Casper server
 
- if [[ ! -e "$quickadd_installer" ]] ; then
-    ScriptLogging "Casper installer is missing. Downloading."
-    /bin/rm -rf "$quickadd_timestamp"
-    update_quickadd
- fi
+    if [[ ! -e "$quickadd_installer" ]] ; then
+        ScriptLogging "Casper installer is missing. Downloading."
+        /bin/rm -rf "$quickadd_timestamp"
+        update_quickadd
+    fi
 
-  if [[ -e "$quickadd_installer" ]] ; then
-    ScriptLogging "Casper installer is present. Installing."
-    /usr/sbin/installer -dumplog -verbose -pkg "$quickadd_installer" -target /
-    ScriptLogging "Casper agent has been installed."
- fi
+    if [[ -e "$quickadd_installer" ]] ; then
+        ScriptLogging "Casper installer is present. Installing."
+        /usr/sbin/installer -dumplog -verbose -pkg "$quickadd_installer" -target /
+        ScriptLogging "Casper agent has been installed."
+    fi
 
 
 }
 
 CheckCasper () {
 
-  #  CheckCasper function adapted from Facebook's jamf_verify.sh script.
-  #  jamf_verify script available on Facebook's IT-CPE Github repo:
-  #  Link: https://github.com/facebook/IT-CPE
+    #  CheckCasper function adapted from Facebook's jamf_verify.sh script.
+    #  jamf_verify script available on Facebook's IT-CPE Github repo:
+    #  Link: https://github.com/facebook/IT-CPE
 
 
 
-  # Checking for the jamf binary
-  CheckBinary
-  if [[ "$jamf_binary" == "" ]]; then
-    ScriptLogging "Casper's jamf binary is missing. It needs to be reinstalled."
-    InstallCasper
+    # Checking for the jamf binary
     CheckBinary
-  fi
+    if [[ "$jamf_binary" == "" ]]; then
+        ScriptLogging "Casper's jamf binary is missing. It needs to be reinstalled."
+        InstallCasper
+        CheckBinary
+    fi
 
-  # Verifying Permissions
-  /usr/bin/chflags noschg $jamf_binary
-  /usr/bin/chflags nouchg $jamf_binary
-  /usr/sbin/chown root:wheel $jamf_binary
-  /bin/chmod 755 $jamf_binary
+    # Verifying Permissions
+    /usr/bin/chflags noschg $jamf_binary
+    /usr/bin/chflags nouchg $jamf_binary
+    /usr/sbin/chown root:wheel $jamf_binary
+    /bin/chmod 755 $jamf_binary
 
-  # Verifies that the JSS is responding to a communication query
-  # by the Casper agent. If the communication check returns a result
-  # of anything greater than zero, the communication check has failed.
-  # If the communication check fails, reinstall the Casper agent using
-  # the cached installer.
-
-
-  jss_comm_chk=`$jamf_binary checkJSSConnection > /dev/null; echo $?`
-
-  if [[ "$jss_comm_chk" -eq 0 ]]; then
-       ScriptLogging "Machine can connect to the JSS on $jss_server_address."
-  elif [[ "$jss_comm_chk" -gt 0 ]]; then
-       ScriptLogging "Machine cannot connect to the JSS on $jss_server_address."
-       ScriptLogging "Reinstalling Casper agent to fix problem of Casper not being able to communicate with the JSS."
-       InstallCasper
-       CheckBinary
-  fi
-
-  # Checking if machine can run a manual trigger
-  # This section will need to be edited if the policy
-  # being triggered has different options than the policy
-  # described below:
-  #
-  # Trigger: iscasperup
-  # Plan: Run Script iscasperonline.sh
-  #
-  # The iscasperonline.sh script contains the following:
-  #
-  # | #!/bin/sh
-  # |
-  # | echo "up"
-  # |
-  # | exit 0
-  #
+    # Verifies that the JSS is responding to a communication query
+    # by the Casper agent. If the communication check returns a result
+    # of anything greater than zero, the communication check has failed.
+    # If the communication check fails, reinstall the Casper agent using
+    # the cached installer.
 
 
-  jamf_policy_chk=`$jamf_binary policy -trigger iscasperup | grep "Script result: up"`
+    jss_comm_chk=`$jamf_binary checkJSSConnection > /dev/null; echo $?`
 
-  # If the machine can run the specified policy, exit the script.
+    if [[ "$jss_comm_chk" -eq 0 ]]; then
+        ScriptLogging "Machine can connect to the JSS on $jss_server_address."
+    elif [[ "$jss_comm_chk" -gt 0 ]]; then
+        ScriptLogging "Machine cannot connect to the JSS on $jss_server_address."
+        ScriptLogging "Reinstalling Casper agent to fix problem of Casper not being able to communicate with the JSS."
+        InstallCasper
+        CheckBinary
+    fi
 
-  if [[ -n "$jamf_policy_chk" ]]; then
-    ScriptLogging "Casper enabled and able to run policies"
+    # Checking if machine can run a manual trigger
+    # This section will need to be edited if the policy
+    # being triggered has different options than the policy
+    # described below:
+    #
+    # Trigger: iscasperup
+    # Plan: Run Script iscasperonline.sh
+    #
+    # The iscasperonline.sh script contains the following:
+    #
+    # | #!/bin/sh
+    # |
+    # | echo "up"
+    # |
+    # | exit 0
+    #
 
-  # If the machine cannot run the specified policy,
-  # reinstall the Casper agent using the cached installer.
 
-  elif [[ ! -n "$jamf_policy_chk" ]]; then
-    ScriptLogging "Reinstalling Casper agent to fix problem of Casper not being able to run policies"
-    InstallCasper
-    CheckBinary
-  fi
+    jamf_policy_chk=`$jamf_binary policy -trigger iscasperup | grep "Script result: up"`
+
+    # If the machine can run the specified policy, exit the script.
+
+    if [[ -n "$jamf_policy_chk" ]]; then
+        ScriptLogging "Casper enabled and able to run policies"
+
+        # If the machine cannot run the specified policy,
+        # reinstall the Casper agent using the cached installer.
+
+    elif [[ ! -n "$jamf_policy_chk" ]]; then
+        ScriptLogging "Reinstalling Casper agent to fix problem of Casper not being able to run policies"
+        InstallCasper
+        CheckBinary
+    fi
 
 
 }
@@ -380,29 +380,29 @@ done
 # the script will exit.
 
 if [[ "${NETWORKUP}" != "-YES-" ]]; then
-   ScriptLogging "Network connection appears to be offline. Exiting CasperCheck."
+    ScriptLogging "Network connection appears to be offline. Exiting CasperCheck."
 fi
 
 
 if [[ "${NETWORKUP}" == "-YES-" ]]; then
-   ScriptLogging "Network connection appears to be live."
+    ScriptLogging "Network connection appears to be live."
 
-  # Sleeping for 120 seconds to give WiFi time to come online.
-  ScriptLogging "Pausing for two minutes to give WiFi and DNS time to come online."
-  sleep 120
-  CheckSiteNetwork
+    # Sleeping for 120 seconds to give WiFi time to come online.
+    ScriptLogging "Pausing for two minutes to give WiFi and DNS time to come online."
+    sleep 120
+    CheckSiteNetwork
 
-  if [[ "$site_network" == "False" ]]; then
-    ScriptLogging "Unable to verify access to site network. Exiting CasperCheck."
-  fi
+    if [[ "$site_network" == "False" ]]; then
+        ScriptLogging "Unable to verify access to site network. Exiting CasperCheck."
+    fi
 
 
-  if [[ "$site_network" == "True" ]]; then
-    ScriptLogging "Access to site network verified"
-    CheckTomcat
-    CheckInstaller
-    CheckCasper
-  fi
+    if [[ "$site_network" == "True" ]]; then
+        ScriptLogging "Access to site network verified"
+        CheckTomcat
+        CheckInstaller
+        CheckCasper
+    fi
 
 fi
 
