@@ -30,9 +30,9 @@ Frequency: Ongoing
 Plan: Run Script iscasperonline.sh
 
 #!/bin/sh
- 
+
  echo "up"
- 
+
  exit 0
 
 When run, the policy will return "Script result: up" among other output. The CasperCheck script verifies if it's received the "Script result: up" output and will use that as the indicator that policies can be successfully run by the Casper agent.
@@ -155,4 +155,3 @@ Blog Posts
 -----------
 
 https://derflounder.wordpress.com/category/caspercheck/
-
