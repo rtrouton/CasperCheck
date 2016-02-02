@@ -4,24 +4,24 @@
 # User-editable variables
 #
 
-# For the fileURL variable, put the complete address 
+# For the fileURL variable, put the complete address
 # of the zipped Casper QuickAdd installer package
 
 fileURL="http://server_name_here.domain.com/quickadd_name_goes_here.zip"
 
-# For the jss_server_address variable, put the complete 
+# For the jss_server_address variable, put the complete
 # fully qualified domain name address of your Casper server
 
 jss_server_address="server_name_here.domain.com"
 
-# For the jss_server_address variable, put the port number 
+# For the jss_server_address variable, put the port number
 # of your Casper server. This is usually 8443; change as
 # appropriate.
 
 jss_server_port="8443"
 
-# For the log_location variable, put the preferred 
-# location of the log file for this script. If you 
+# For the log_location variable, put the preferred
+# location of the log file for this script. If you
 # don't have a preference, using the default setting
 # should be fine.
 
@@ -29,7 +29,7 @@ log_location="/var/log/caspercheck.log"
 
 #
 # The variables below this line should not need to be edited.
-# Use caution if doing so. 
+# Use caution if doing so.
 #
 
 quickadd_dir="/var/root/quickadd"
@@ -52,7 +52,7 @@ ScriptLogging(){
 
     DATE=`date +%Y-%m-%d\ %H:%M:%S`
     LOG="$log_location"
-    
+
     echo "$DATE" " $1" >> $LOG
 }
 
@@ -61,7 +61,7 @@ CheckForNetwork(){
 # Determine if the network is up by looking for any non-loopback network interfaces.
 
     local test
-    
+
     if [[ -z "${NETWORKUP:=}" ]]; then
         test=$(ifconfig -a inet 2>/dev/null | sed -n -e '/127.0.0.1/d' -e '/0.0.0.0/d' -e '/inet/p' | wc -l)
         if [[ "${test}" -gt 0 ]]; then
@@ -81,15 +81,15 @@ CheckSiteNetwork (){
   #   This script verifies a system is on the corporate network.
   #   Input: CORP_URL= set this to a hostname on your corp network
   #   Optional ($1) contains a parameter that is used for testing.
-  #   Output: Returns a check_corp variable that will return "True" if on 
+  #   Output: Returns a check_corp variable that will return "True" if on
   #   corp network, "False" otherwise.
   #   If a parameter is passed ($1), the check_corp variable will return it
   #   This is useful for testing scripts where you want to force check_corp
   #   to be either "True" or "False"
-  # USAGE: 
+  # USAGE:
   #   check_corp        # No parameter passed
   #   check_corp "True"  # Parameter of "True" is passed and returned
-  
+
 
   site_network="False"
   ping=`host -W .5 $jss_server_address`
@@ -103,7 +103,7 @@ CheckSiteNetwork (){
 
 #
 # The update_quickadd function checks the timestamp of the fileURL variable and compares it against a locally
-# cached timestamp. If the hosted file's timestamp is newer, then the Casper 
+# cached timestamp. If the hosted file's timestamp is newer, then the Casper
 # QuickAdd installer gets downloaded and extracted into the target directory.
 #
 # This function uses the myCurl function defined at the top of the script.
@@ -112,23 +112,23 @@ CheckSiteNetwork (){
 update_quickadd () {
 
     # Get modification date of fileURL
-    
+
     modDate=$(myCurl --head $fileURL 2>/dev/null | awk -F': ' '/Last-Modified/{print $2}')
 
     # Downloading Casper agent installer
-    
+
     ScriptLogging "Downloading Casper agent installer from server."
-    
+
     myCurl --output "$quickadd_zip" $fileURL
-    
+
     # Check to make sure download occurred
-    
+
     if [[ ! -f "$quickadd_zip" ]]; then
         ScriptLogging "$quickadd_zip not found. Exiting CasperCheck."
         ScriptLogging "======== CasperCheck Finished ========"
         exit 0
     fi
-    
+
     # Verify that the downloaded zip file is a valid zip archive.
 
     zipfile_chk=`/usr/bin/unzip -tq $quickadd_zip > /dev/null; echo $?`
@@ -141,47 +141,47 @@ update_quickadd () {
        rm "$quickadd_zip"
        exit 0
     fi
-    
+
     # Create the destination directory if needed
-    
+
     if [[ ! -d "$quickadd_dir" ]]; then
         mkdir "$quickadd_dir"
     fi
-    
+
     # If needed, remove existing files from the destination directory
-    
+
     if [[ -d "$quickadd_dir" ]]; then
         /bin/rm -rf "$quickadd_dir"/*
     fi
-    
+
     # Unzip the Casper agent install into the destination directory
     # and remove the __MACOSX directory, which is created as part of
     # the uncompression process from the destination directory.
-    
+
     /usr/bin/unzip "$quickadd_zip" -d "$quickadd_dir";/bin/rm -rf "$quickadd_dir"/__MACOSX
-    
+
     # Rename newly-downloaded installer to be casper.pkg
-    
+
     mv "$(/usr/bin/find $quickadd_dir -maxdepth 1 \( -iname \*\.pkg -o -iname \*\.mpkg \))" "$quickadd_installer"
-    
+
     # Remove downloaded zip file
     if [[ -f "$quickadd_zip" ]]; then
         /bin/rm -rf "$quickadd_zip"
     fi
-    
-    # Add the quickadd_timestamp file to the destination directory. 
-    # This file is used to help verify if the current Casper agent 
+
+    # Add the quickadd_timestamp file to the destination directory.
+    # This file is used to help verify if the current Casper agent
     # installer is already cached on the machine.
-    
+
     if [[ ! -f "$quickadd_timestamp" ]]; then
         echo $modDate > "$quickadd_timestamp"
-    fi   
-    
-    
+    fi
+
+
 }
 
 CheckTomcat (){
- 
+
 # Verifies that the JSS's Tomcat service is responding via its assigned port.
 
 
@@ -198,7 +198,7 @@ fi
 }
 
 CheckInstaller (){
- 
+
 # Compare timestamps and update the Casper agent
 # installer if needed.
 
@@ -206,8 +206,8 @@ CheckInstaller (){
 
 if [[ -f "$quickadd_timestamp" ]]; then
     cachedDate=$(cat "$quickadd_timestamp")
-    
-    
+
+
     if [[ "$cachedDate" == "$modDate" ]]; then
         ScriptLogging "Current Casper installer already cached."
     else
@@ -220,7 +220,7 @@ fi
 }
 
 CheckBinary (){
- 
+
 # Identify location of jamf binary.
 #
 # If the jamf binary is not found, this check will return a
@@ -245,19 +245,19 @@ InstallCasper () {
  # Check for the cached Casper QuickAdd installer and run it
  # to fix problems with Casper being able to communicate with
  # the Casper server
- 
+
  if [[ ! -e "$quickadd_installer" ]] ; then
     ScriptLogging "Casper installer is missing. Downloading."
     /bin/rm -rf "$quickadd_timestamp"
     update_quickadd
  fi
- 
+
   if [[ -e "$quickadd_installer" ]] ; then
     ScriptLogging "Casper installer is present. Installing."
     /usr/sbin/installer -dumplog -verbose -pkg "$quickadd_installer" -target /
     ScriptLogging "Casper agent has been installed."
  fi
- 
+
 
 }
 
@@ -282,8 +282,8 @@ CheckCasper () {
   /usr/bin/chflags nouchg $jamf_binary
   /usr/sbin/chown root:wheel $jamf_binary
   /bin/chmod 755 $jamf_binary
-  
-  # Verifies that the JSS is responding to a communication query 
+
+  # Verifies that the JSS is responding to a communication query
   # by the Casper agent. If the communication check returns a result
   # of anything greater than zero, the communication check has failed.
   # If the communication check fails, reinstall the Casper agent using
@@ -308,7 +308,7 @@ CheckCasper () {
   #
   # Trigger: iscasperup
   # Plan: Run Script iscasperonline.sh
-  # 
+  #
   # The iscasperonline.sh script contains the following:
   #
   # | #!/bin/sh
@@ -318,7 +318,7 @@ CheckCasper () {
   # | exit 0
   #
 
-  
+
   jamf_policy_chk=`$jamf_binary policy -trigger iscasperup | grep "Script result: up"`
 
   # If the machine can run the specified policy, exit the script.
@@ -326,7 +326,7 @@ CheckCasper () {
   if [[ -n "$jamf_policy_chk" ]]; then
     ScriptLogging "Casper enabled and able to run policies"
 
-  # If the machine cannot run the specified policy, 
+  # If the machine cannot run the specified policy,
   # reinstall the Casper agent using the cached installer.
 
   elif [[ ! -n "$jamf_policy_chk" ]]; then
@@ -355,9 +355,9 @@ CheckCasper () {
 
 ScriptLogging "======== Starting CasperCheck ========"
 
-# Wait up to 60 minutes for a network connection to become 
-# available which doesn't use a loopback address. This 
-# condition which may occur if this script is run by a 
+# Wait up to 60 minutes for a network connection to become
+# available which doesn't use a loopback address. This
+# condition which may occur if this script is run by a
 # LaunchDaemon at boot time.
 #
 # The network connection check will occur every 5 seconds
@@ -382,11 +382,11 @@ done
 if [[ "${NETWORKUP}" != "-YES-" ]]; then
    ScriptLogging "Network connection appears to be offline. Exiting CasperCheck."
 fi
-   
+
 
 if [[ "${NETWORKUP}" == "-YES-" ]]; then
    ScriptLogging "Network connection appears to be live."
-  
+
   # Sleeping for 120 seconds to give WiFi time to come online.
   ScriptLogging "Pausing for two minutes to give WiFi and DNS time to come online."
   sleep 120
@@ -394,7 +394,7 @@ if [[ "${NETWORKUP}" == "-YES-" ]]; then
 
   if [[ "$site_network" == "False" ]]; then
     ScriptLogging "Unable to verify access to site network. Exiting CasperCheck."
-  fi 
+  fi
 
 
   if [[ "$site_network" == "True" ]]; then
