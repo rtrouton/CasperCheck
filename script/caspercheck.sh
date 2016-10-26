@@ -33,8 +33,10 @@ log_location="/var/log/caspercheck.log"
 #
 
 # Get root users home directory
-rootHome=$(dscl . -read /Users/root|awk '/NFSHomeDirectory/{print $NF}')
-
+rootHome=$(dscl . -read /Users/rxoot 2>/dev/null|awk '/NFSHomeDirectory/{print $NF}')
+if [ -z $rootHome ]; then
+    rootHome="/var/root"
+fi
 quickadd_dir="/var/root/quickadd"
 quickadd_zip="$rootHome/quickadd.zip"
 quickadd_installer="$quickadd_dir/casper.pkg"
