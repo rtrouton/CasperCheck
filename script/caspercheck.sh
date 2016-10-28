@@ -31,8 +31,6 @@ log_location="/var/log/caspercheck.log"
 # The variables below this line should not need to be edited.
 # Use caution if doing so. 
 #
-
-# Get root users home directory
 quickadd_dir="/var/root/quickadd"
 quickadd_zip="/var/root/quickadd.zip"
 quickadd_installer="$quickadd_dir/casper.pkg"
