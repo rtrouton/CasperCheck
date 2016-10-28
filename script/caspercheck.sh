@@ -31,9 +31,8 @@ log_location="/var/log/caspercheck.log"
 # The variables below this line should not need to be edited.
 # Use caution if doing so. 
 #
-
 quickadd_dir="/var/root/quickadd"
-quickadd_zip="/tmp/quickadd.zip"
+quickadd_zip="/var/root/quickadd/quickadd.zip"
 quickadd_installer="$quickadd_dir/casper.pkg"
 quickadd_timestamp="$quickadd_dir/quickadd_timestamp"
 
@@ -146,6 +145,7 @@ update_quickadd () {
     
     if [[ ! -d "$quickadd_dir" ]]; then
         mkdir "$quickadd_dir"
+        chmod 700 "$quickadd_dir"
     fi
     
     # If needed, remove existing files from the destination directory
