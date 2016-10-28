@@ -33,7 +33,7 @@ log_location="/var/log/caspercheck.log"
 #
 
 quickadd_dir="/var/root/quickadd"
-quickadd_zip="/tmp/quickadd.zip"
+quickadd_zip="$quickadd_dir/quickadd.zip"
 quickadd_installer="$quickadd_dir/casper.pkg"
 quickadd_timestamp="$quickadd_dir/quickadd_timestamp"
 
@@ -110,6 +110,17 @@ CheckSiteNetwork (){
 #
 
 update_quickadd () {
+    # Create the destination directory if needed
+    
+    if [[ ! -d "$quickadd_dir" ]]; then
+        mkdir "$quickadd_dir"
+    fi
+    
+    # If needed, remove existing files from the destination directory
+    
+    if [[ -d "$quickadd_dir" ]]; then
+        /bin/rm -rf "$quickadd_dir"/*
+    fi
 
     # Get modification date of fileURL
     
@@ -141,19 +152,7 @@ update_quickadd () {
        rm "$quickadd_zip"
        exit 0
     fi
-    
-    # Create the destination directory if needed
-    
-    if [[ ! -d "$quickadd_dir" ]]; then
-        mkdir "$quickadd_dir"
-    fi
-    
-    # If needed, remove existing files from the destination directory
-    
-    if [[ -d "$quickadd_dir" ]]; then
-        /bin/rm -rf "$quickadd_dir"/*
-    fi
-    
+        
     # Unzip the Casper agent install into the destination directory
     # and remove the __MACOSX directory, which is created as part of
     # the uncompression process from the destination directory.
