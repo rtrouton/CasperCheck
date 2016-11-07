@@ -110,6 +110,17 @@ CheckSiteNetwork (){
 #
 
 update_quickadd () {
+    # Create the destination directory if needed
+    
+    if [[ ! -d "$quickadd_dir" ]]; then
+        mkdir "$quickadd_dir"
+    fi
+    
+    # If needed, remove existing files from the destination directory
+    
+    if [[ -d "$quickadd_dir" ]]; then
+        /bin/rm -rf "$quickadd_dir"/*
+    fi
 
     # Create the destination directory if needed
     
