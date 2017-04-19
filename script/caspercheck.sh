@@ -20,6 +20,12 @@ jss_server_address="server_name_here.domain.com"
 
 jss_server_port="8443"
 
+# For the requireValidSSL, if you have SSL setup correctly on your tomcat servers
+# then set it to true, else leave it at false.  You must also have your QuickAdd 
+# signed properly, else this should be left at false.
+
+requireValidSSL=false
+
 # For the log_location variable, put the preferred 
 # location of the log file for this script. If you 
 # don't have a preference, using the default setting
@@ -43,7 +49,15 @@ quickadd_timestamp="$quickadd_dir/quickadd_timestamp"
 #
 
 # Function to provide custom curl options
-myCurl () { /usr/bin/curl -k --retry 3 --silent --show-error "$@"; }
+if [ $requireValidSSL = false ]; then
+    useSecure="-k"
+elif [ $requireValidSSL = true ]; then
+    useSecure=""
+else
+    useSecure="-k"
+    ScriptLogging "Invalid Pref: requireValidSSL. Should be true or false, found $requireValidSSL. Using insecure."
+fi
+myCurl () { /usr/bin/curl $useSecure --retry 3 --silent --show-error "$@"; }
 
 # Function to provide logging of the script's actions to
 # the log file defined by the log_location variable
@@ -253,7 +267,12 @@ InstallCasper () {
  
   if [[ -e "$quickadd_installer" ]] ; then
     ScriptLogging "Casper installer is present. Installing."
-    /usr/sbin/installer -dumplog -verbose -pkg "$quickadd_installer" -target /
+    if [ $requireValidSSL = false ]; then
+        allowUTrust="-allowUntrusted"
+    else
+        allowUTrust=""
+    fi  
+    /usr/sbin/installer $allowUTrust -dumplog -verbose -pkg "$quickadd_installer" -target /
     ScriptLogging "Casper agent has been installed."
  fi
  
