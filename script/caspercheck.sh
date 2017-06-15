@@ -184,7 +184,7 @@ CheckTomcat (){
 # Verifies that the JSS's Tomcat service is responding via its assigned port.
 
 
-tomcat_chk=`nc -z -w 5 $jss_server_address $jss_server_port > /dev/null; echo $?`
+tomcat_chk=`nc -z -G 5 $jss_server_address $jss_server_port > /dev/null; echo $?`
 
 if [ "$tomcat_chk" -eq 0 ]; then
        ScriptLogging "Machine can connect to $jss_server_address over port $jss_server_port. Proceeding."
