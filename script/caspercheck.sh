@@ -57,7 +57,7 @@ else
     useSecure="-k"
     ScriptLogging "Invalid Pref: requireValidSSL. Should be true or false, found $requireValidSSL. Using insecure."
 fi
-myCurl () { /usr/bin/curl $useSecure --retry 3 --silent --show-error "$@"; }
+myCurl () { /usr/bin/curl $useSecure -L --retry 3 --silent --show-error "$@"; }
 
 # Function to provide logging of the script's actions to
 # the log file defined by the log_location variable

@@ -55,19 +55,19 @@ The LaunchDaemon will run on the following command on startup. After startup, th
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-	<dict>
-		<key>Label</key>
-		<string>com.company.caspercheck</string>
-		<key>ProgramArguments</key>
-		<array>
-			<string>sh</string>
-			<string>/Library/Scripts/caspercheck.sh</string>
-		</array>
-		<key>RunAtLoad</key>
-			<true />
-			<key>StartInterval</key>
-			<integer>604800</integer>
-	</dict>
+<dict>
+	<key>Label</key>
+	<string>com.company.caspercheck</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>sh</string>
+		<string>/Library/Scripts/caspercheck.sh</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>StartInterval</key>
+	<integer>590400</integer>
+</dict>
 </plist>
 ```
 
