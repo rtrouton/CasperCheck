@@ -1,3 +1,5 @@
+[![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
+
 #CasperCheck
 
 For folks using [JAMF Software's Casper](https://www.jamf.com/) solution, sometimes the Casper agent installed on individual Macs stops working properly. They stop checking in with the Casper server, or check in but can't run policies anymore. To help address this issue, CasperCheck provides an automated way to check and repair Casper agents that are not working properly. As designed, this solution will do the following:
